@@ -1,6 +1,6 @@
 # Ical2hash
 
-https://github.com/thehighhigh/ical2hash/actions/workflows/ci.yml/badge.svg
+![RSpec](https://github.com/thehighhigh/ical2hash/actions/workflows/ci.yml/badge.svg)
 
 Ical2hash is a Gem that can convert ics-format text into a ruby hash object.
 Conversely, it also has the ability to convert from a hash object to ics format text.
