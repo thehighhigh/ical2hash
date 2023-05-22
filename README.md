@@ -1,31 +1,172 @@
 # Ical2hash
 
-TODO: Delete this and the text below, and describe your gem
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/ical2hash`. To experiment with that code, run `bin/console` for an interactive prompt.
+Ical2hash is a Gem that can convert ics-format text into a ruby hash object.
+Conversely, it also has the ability to convert from a hash object to ics format text.
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
-
-Install the gem and add to the application's Gemfile by executing:
-
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
-
-If bundler is not being used to manage dependencies, install the gem by executing:
-
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+```
+$ gem install ical2hash
+```
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+require 'ical2hash'
 
-## Development
+ics_txt = <<"ics"
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//OpenAI//GPT-3.5//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Test Calendar
 
-After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+BEGIN:VEVENT
+DTSTART:20230522T090000
+DTEND:20230522T110000
+SUMMARY:Meeting
+DESCRIPTION:This is an internal meeting to discuss the progress of the project.
+LOCATION:Conference Room A
+END:VEVENT
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+BEGIN:VEVENT
+DTSTART:20230526T083000
+DTEND:20230526T120000
+SUMMARY:External Conference
+DESCRIPTION:This is a conference with industry leaders. We will discuss market trends and competitive analysis.
+LOCATION:Hotel Conference Room
+END:VEVENT
+
+END:VCALENDAR
+ics
+
+Ical2hash.convert(ics_txt)
+
+# => {
+#   "VCALENDAR"=>[
+#     {
+#       "VERSION"=>"2.0",
+#       "PRODID"=>"-//OpenAI//GPT-3.5//EN",
+#       "CALSCALE"=>"GREGORIAN",
+#       "METHOD"=>"PUBLISH",
+#       "X-WR-CALNAME"=>"Test Calendar",
+#       "VEVENT"=>[
+#         {
+#           "DTSTART"=>"20230522T090000",
+#           "DTEND"=>"20230522T110000",
+#           "SUMMARY"=>"Meeting",
+#           "DESCRIPTION"=>"This is an internal meeting to discuss the progress of the project.",
+#           "LOCATION"=>"Conference Room A"
+#         }, 
+#         {
+#           "DTSTART"=>"20230526T083000",
+#           "DTEND"=>"20230526T120000",
+#           "SUMMARY"=>"External Conference",
+#           "DESCRIPTION"=>"This is a conference with industry leaders. We will discuss market trends and competitive analysis.",
+#           "LOCATION"=>"Hotel Conference Room"
+#         }
+#       ]
+#     }
+#   ]
+# }
+
+hash = {
+          "VCALENDAR"=>[
+            {
+              "VERSION"=>"2.0",
+              "PRODID"=>"-//OpenAI//GPT-3.5//EN",
+              "CALSCALE"=>"GREGORIAN",
+              "METHOD"=>"PUBLISH",
+              "X-WR-CALNAME"=>"Test Calendar",
+              "VEVENT"=>[
+                {
+                  "DTSTART"=>"20230522T090000",
+                  "DTEND"=>"20230522T110000",
+                  "SUMMARY"=>"Meeting",
+                  "DESCRIPTION"=>"This is an internal meeting to discuss the progress of the project.",
+                  "LOCATION"=>"Conference Room A"
+                }
+              ]
+            }
+          ]
+        }
+
+Ical2hash.revert(hash)
+
+# => "BEGIN:VCALENDAR\r\n
+# VERSION:2.0\r\n
+# PRODID:-//OpenAI//GPT-3.5//EN\r\n
+# CALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\n
+# X-WR-CALNAME:Test Calendar\r\n
+# BEGIN:VEVENT\r\n
+# DTSTART:20230522T090000\r\n
+# DTEND:20230522T110000\r\n
+# SUMMARY:Meeting\r\n
+# DESCRIPTION:This is an internal meeting to discuss the progress of the project.\r\n
+# LOCATION:Conference Room A\r\n
+# END:VEVENT\r\n
+# END:VCALENDAR\r\n"
+
+
+ical_hash = {
+  "VCALENDAR"=>[
+    {
+      "VERSION"=>"2.0",
+      "PRODID"=>"-//OpenAI//GPT-3.5//EN",
+      "CALSCALE"=>"GREGORIAN",
+      "METHOD"=>"PUBLISH",
+      "X-WR-CALNAME"=>"Test Calendar",
+      "VEVENT"=>[
+        {
+          "DTSTART"=>"20230522T090000",
+          "DTEND"=>"20230522T110000",
+          "SUMMARY"=>"Meeting",
+          "DESCRIPTION"=>"This is an internal meeting to discuss the progress of the project.",
+          "LOCATION"=>"Conference Room A"
+        }
+      ]
+    }
+  ]
+}
+
+ical_hash["VCALENDAR"][0]["VEVENT"] <<  {
+                                          "DTSTART"=>"20230526T083000",
+                                          "DTEND"=>"20230526T120000",
+                                          "SUMMARY"=>"External Conference",
+                                          "DESCRIPTION"=>"This is a conference with industry leaders. We will discuss market trends and competitive analysis.",
+                                          "LOCATION"=>"Hotel Conference Room"
+                                        }
+
+Ical2hash.revert(ical_hash)
+
+#=> "BEGIN:VCALENDAR\r\n
+# VERSION:2.0\r\n
+# PRODID:-//OpenAI//GPT-3.5//EN\r\n
+# CALSCALE:GREGORIAN\r\n
+# METHOD:PUBLISH\r\n
+# X-WR-CALNAME:Test Calendar\r\n
+# BEGIN:VEVENT\r\n
+# DTSTART:20230522T090000\r\n
+# DTEND:20230522T110000\r\n
+# SUMMARY:Meeting\r\n
+# DESCRIPTION:This is an internal meeting to discuss the progress of the project.\r\n
+# LOCATION:Conference Room A\r\n
+# END:VEVENT\r\n
+# BEGIN:VEVENT\r\n
+# DTSTART:20230526T083000\r\n
+# DTEND:20230526T120000\r\n
+# SUMMARY:External Conference\r\n
+# DESCRIPTION:This is a conference with industry leaders. We will discuss market trends and competitive analysis.\r\n
+# LOCATION:Hotel Conference Room\r\n
+# END:VEVENT\r\n
+# END:VCALENDAR\r\n"
+
+```
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/ical2hash.
+Bug reports and pull requests are welcome on GitHub at https://github.com/thehighhigh/ical2hash.
+
+## License
+The gem is available as open source under the terms of the MIT License.
