@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.summary = 'It can convert ical txt to hash object and revert.'
   spec.description = 'It can convert ical txt to hash object and revert.'
   spec.homepage = 'https://github.com/thehighhigh/ical2hash'
-  spec.required_ruby_version = '>= 2.6.0'
+  spec.required_ruby_version = '>= 2.7.0'
   spec.license = 'MIT'
   spec.metadata['allowed_push_host'] = 'https://rubygems.org'
 
