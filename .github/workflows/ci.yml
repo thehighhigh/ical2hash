@@ -1,11 +1,9 @@
 name: CI
-
 on:
   push:
     branches:
       - main
   pull_request:
-
 jobs:
   ci:
     runs-on: ${{ matrix.os }}
@@ -25,17 +23,10 @@ jobs:
           - "head"
     steps:
       - uses: actions/checkout@v3
-
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
-
-      - name: Install dependencies
-        run: |
-          gem install bundler
-          bundle install
-
       - name: Run the default task
         run: bundle exec rake
